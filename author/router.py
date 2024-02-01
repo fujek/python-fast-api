@@ -3,8 +3,8 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
+from author.schema import AuthorInput, Author
 from db.config import get_session
-from schemas import Author, AuthorInput
 
 router = APIRouter(prefix="/api/authors")
 
