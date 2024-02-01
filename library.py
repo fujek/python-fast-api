@@ -1,9 +1,16 @@
 import time
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, Request, Depends
+from fastapi import FastAPI, Request
+from sqlmodel import SQLModel
+
+from db import engine
+from routers import books, authors
 
 app = FastAPI(title="Library")
+
+app.include_router(authors.router)
+app.include_router(books.router)
 
 origins = [
     "http://localhost",
@@ -28,5 +35,10 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
+@app.on_event("startup")
+def on_startup():
+    SQLModel.metadata.create_all(engine)
+
+
 if __name__ == "__main__":
-    uvicorn.run('main:app', reload=True)
+    uvicorn.run('library:app', reload=True)
