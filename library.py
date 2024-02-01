@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Request
 from sqlmodel import SQLModel
 
-from db import engine
+from db.config import engine
 from routers import books, authors
 
 app = FastAPI(title="Library")

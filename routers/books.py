@@ -3,7 +3,7 @@ from typing import List
 from fastapi import FastAPI, HTTPException, APIRouter, Depends
 from sqlmodel import Session, select
 
-from db import get_session
+from db.config import get_session
 from schemas import Book, BookInput
 
 router = APIRouter(prefix="/api/books")
