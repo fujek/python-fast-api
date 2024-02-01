@@ -8,6 +8,21 @@ class BookInput(SQLModel):
     isbn: str
     cover: str
     author_id: int = Field(foreign_key="author.id")
+    description: str
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "name": "W pustyni i w puszczy",
+                    "isbn": "1212103-2321-11",
+                    "cover": "cover.jpg",
+                    "author_id": 1,
+                    "description": "Book's short description"
+                }
+            ]
+        }
+    }
 
 
 class Book(BookInput, table=True):
