@@ -3,6 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
+from auth.role_service import require_admin_permission
 from auth.token_service import verify_access_token
 from author.schema import AuthorInput, Author
 from books.schema import Book
@@ -11,7 +12,8 @@ from db.config import get_session
 router = APIRouter(prefix="/api/authors")
 
 
-@router.post("/", response_model=Author, status_code=201, dependencies=[Depends(verify_access_token)])
+@router.post("/", response_model=Author, status_code=201,
+             dependencies=[Depends(verify_access_token), Depends(require_admin_permission)])
 def create_author(author: AuthorInput, session: Session = Depends(get_session)):
     new_author = Author.model_validate(author)
     session.add(new_author)
@@ -20,7 +22,8 @@ def create_author(author: AuthorInput, session: Session = Depends(get_session)):
     return new_author
 
 
-@router.put("/{author_id}", response_model=Author, dependencies=[Depends(verify_access_token)])
+@router.put("/{author_id}", response_model=Author,
+            dependencies=[Depends(verify_access_token), Depends(require_admin_permission)])
 def update_author(author_id: int, updated_author: AuthorInput, session: Session = Depends(get_session)):
     author = session.get(Author, author_id)
     if not author:
@@ -47,7 +50,8 @@ def read_author(author_id: int, session: Session = Depends(get_session)):
     return author
 
 
-@router.delete("/{author_id}", status_code=204, dependencies=[Depends(verify_access_token)])
+@router.delete("/{author_id}", status_code=204,
+               dependencies=[Depends(verify_access_token), Depends(require_admin_permission)])
 def delete_author(author_id: int, session: Session = Depends(get_session)):
     author = session.get(Author, author_id)
     if not author:

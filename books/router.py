@@ -5,6 +5,7 @@ from fastapi import HTTPException, APIRouter, Depends, UploadFile, File
 from fastapi.responses import FileResponse
 from sqlmodel import Session, select
 
+from auth.role_service import require_admin_permission
 from auth.token_service import verify_access_token
 from books.schema import Book, BookInput
 from db.config import get_session
@@ -14,7 +15,8 @@ router = APIRouter(prefix="/api/books")
 covers_directory = "covers"
 
 
-@router.post("/", status_code=201, dependencies=[Depends(verify_access_token)])
+@router.post("/", status_code=201,
+             dependencies=[Depends(verify_access_token), Depends(require_admin_permission)])
 def create_book(book: BookInput, session: Session = Depends(get_session)) -> Book:
     new_book = Book.model_validate(book)
     session.add(new_book)
@@ -23,7 +25,7 @@ def create_book(book: BookInput, session: Session = Depends(get_session)) -> Boo
     return new_book
 
 
-@router.put("/{book_id}", dependencies=[Depends(verify_access_token)])
+@router.put("/{book_id}", dependencies=[Depends(verify_access_token), Depends(require_admin_permission)])
 def update_book(book_id: int, updated_book: BookInput, session: Session = Depends(get_session)) -> Book:
     book = get_book(book_id, session)
     for key, value in updated_book.dict().items():
@@ -45,7 +47,8 @@ def read_book(book_id: int, session: Session = Depends(get_session)) -> Book:
     return get_book(book_id, session)
 
 
-@router.delete("/{book_id}", status_code=204, dependencies=[Depends(verify_access_token)])
+@router.delete("/{book_id}", status_code=204,
+               dependencies=[Depends(verify_access_token), Depends(require_admin_permission)])
 def delete_book(book_id: int, session: Session = Depends(get_session)):
     book = get_book(book_id, session)
     session.delete(book)
@@ -59,7 +62,8 @@ def get_book_cover(book_id: int, session: Session = Depends(get_session)) -> Fil
     return FileResponse(file_path, headers={"Content-Disposition": f"attachment; filename={book.cover_file_name}"})
 
 
-@router.post("/{book_id}/cover", status_code=204, dependencies=[Depends(verify_access_token)])
+@router.post("/{book_id}/cover", status_code=204,
+             dependencies=[Depends(verify_access_token), Depends(require_admin_permission)])
 def save_book_cover(book_id: int, cover: UploadFile = File(...), session: Session = Depends(get_session)):
     book = get_book(book_id, session)
     book.cover_file_name = cover.filename

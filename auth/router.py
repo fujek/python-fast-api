@@ -23,5 +23,5 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     user = session.exec(select(User).where(User.username == form_data.username)).first()
     if not user or not verify_password(form_data.password, user.password):
         raise HTTPException(status_code=401, detail="Incorrect username or password")
-    access_token = create_access_token(user.username)
+    access_token = create_access_token(user)
     return Token(access_token=access_token, token_type="bearer")
