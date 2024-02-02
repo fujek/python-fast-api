@@ -1,5 +1,5 @@
 import os
-from typing import List, Sequence
+from typing import Sequence
 
 from fastapi import HTTPException, APIRouter, Depends, UploadFile, File
 from fastapi.responses import FileResponse

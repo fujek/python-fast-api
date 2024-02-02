@@ -6,7 +6,8 @@ from sqlmodel import SQLModel
 
 from author.router import router as author_router
 from books.router import router as books_router
-from auth.router import router as auth_router, pwd_context
+from auth.router import router as auth_router
+from borrow.router import router as borrow_router
 from db.config import engine
 
 app = FastAPI(title="Library")
@@ -14,6 +15,7 @@ app = FastAPI(title="Library")
 app.include_router(author_router)
 app.include_router(books_router)
 app.include_router(auth_router)
+app.include_router(borrow_router)
 
 origins = [
     "http://localhost",

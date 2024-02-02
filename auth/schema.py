@@ -24,5 +24,6 @@ class Token(BaseModel):
 
 class TokenUser(BaseModel):
     sub: str
+    user_id: int
     exp: datetime
     role: UserRole

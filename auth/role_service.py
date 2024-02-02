@@ -9,6 +9,5 @@ def check_permissions(user_role: UserRole, required_role: UserRole):
         raise HTTPException(status_code=403, detail="Insufficient permissions")
 
 
-async def require_admin_permission(current_user: dict = Depends(verify_access_token)):
-    token_user = TokenUser.model_validate(current_user)
-    check_permissions(token_user.role, UserRole.ADMIN)
+async def require_admin_permission(current_user: TokenUser = Depends(verify_access_token)):
+    check_permissions(current_user.role, UserRole.ADMIN)

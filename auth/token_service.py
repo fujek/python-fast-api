@@ -16,13 +16,14 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 def create_access_token(user: User):
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    encoded_jwt = jwt.encode(TokenUser(sub=user.username, exp=expire, role=user.role).dict(), SECRET_KEY, algorithm=ALGORITHM)
+    token_user = TokenUser(sub=user.username, user_id=user.id, exp=expire, role=user.role)
+    encoded_jwt = jwt.encode(token_user.dict(), SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
-def verify_access_token(token: str = Depends(oauth2_scheme)) -> User:
+def verify_access_token(token: str = Depends(oauth2_scheme)) -> TokenUser:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload
+        return TokenUser.model_validate(payload)
     except jwt.JWTError:
         raise HTTPException(status_code=401, detail="Invalid credentials")
