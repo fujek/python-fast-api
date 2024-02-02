@@ -10,12 +10,8 @@ from db.config import get_session
 
 router = APIRouter(prefix=API_PATH_URL)
 
-
 pwd_context = CryptContext(schemes=["bcrypt"])
 
-
-# def get_password_hash(password):
-#     return pwd_context.hash(password)
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)

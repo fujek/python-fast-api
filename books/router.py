@@ -14,7 +14,7 @@ router = APIRouter(prefix="/api/books")
 covers_directory = "covers"
 
 
-@router.post("/", status_code=201)
+@router.post("/", status_code=201, dependencies=[Depends(verify_access_token)])
 def create_book(book: BookInput, session: Session = Depends(get_session)) -> Book:
     new_book = Book.model_validate(book)
     session.add(new_book)
@@ -23,7 +23,7 @@ def create_book(book: BookInput, session: Session = Depends(get_session)) -> Boo
     return new_book
 
 
-@router.put("/{book_id}")
+@router.put("/{book_id}", dependencies=[Depends(verify_access_token)])
 def update_book(book_id: int, updated_book: BookInput, session: Session = Depends(get_session)) -> Book:
     book = get_book(book_id, session)
     for key, value in updated_book.dict().items():
@@ -45,7 +45,7 @@ def read_book(book_id: int, session: Session = Depends(get_session)) -> Book:
     return get_book(book_id, session)
 
 
-@router.delete("/{book_id}", status_code=204)
+@router.delete("/{book_id}", status_code=204, dependencies=[Depends(verify_access_token)])
 def delete_book(book_id: int, session: Session = Depends(get_session)):
     book = get_book(book_id, session)
     session.delete(book)
