@@ -5,6 +5,7 @@ from fastapi import HTTPException, APIRouter, Depends, UploadFile, File
 from fastapi.responses import FileResponse
 from sqlmodel import Session, select
 
+from auth.token_service import verify_access_token
 from books.schema import Book, BookInput
 from db.config import get_session
 
@@ -58,7 +59,7 @@ def get_book_cover(book_id: int, session: Session = Depends(get_session)) -> Fil
     return FileResponse(file_path, headers={"Content-Disposition": f"attachment; filename={book.cover_file_name}"})
 
 
-@router.post("/{book_id}/cover", status_code=204)
+@router.post("/{book_id}/cover", status_code=204, dependencies=[Depends(verify_access_token)])
 def save_book_cover(book_id: int, cover: UploadFile = File(...), session: Session = Depends(get_session)):
     book = get_book(book_id, session)
     book.cover_file_name = cover.filename

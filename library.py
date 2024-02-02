@@ -4,14 +4,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Request
 from sqlmodel import SQLModel
 
-import author.router as author_router
-import books.router as books_router
+from author.router import router as author_router
+from books.router import router as books_router
+from auth.router import router as auth_router, pwd_context
 from db.config import engine
 
 app = FastAPI(title="Library")
 
-app.include_router(author_router.router)
-app.include_router(books_router.router)
+app.include_router(author_router)
+app.include_router(books_router)
+app.include_router(auth_router)
 
 origins = [
     "http://localhost",
@@ -39,6 +41,12 @@ async def add_process_time_header(request: Request, call_next):
 @app.on_event("startup")
 def on_startup():
     SQLModel.metadata.create_all(engine)
+    # with Session(engine) as session:
+    #     user = User()
+    #     user.username = 'damian'
+    #     user.password = pwd_context.hash('test')
+    #     session.add(user)
+    #     session.commit()
 
 
 if __name__ == "__main__":

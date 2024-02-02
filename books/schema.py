@@ -27,5 +27,5 @@ class BookInput(SQLModel):
 
 class Book(BookInput, table=True):
     id: int = Field(default=None, primary_key=True)
-    cover_file_name: str = None
+    cover_file_name: Optional[str] = None
     author: Author = Relationship(back_populates="books")
