@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlmodel import Session
 
 engine = create_engine(
-    "sqlite:///library.db",
+    "sqlite:///db/library.db",
     connect_args={"check_same_thread": False},
     echo=True
 )
