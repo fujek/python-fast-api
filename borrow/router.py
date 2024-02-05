@@ -25,15 +25,25 @@ async def borrow_book(borrow_data: BorrowInput, current_user: TokenUser = Depend
 @router.put("/{borrow_id}/return")
 async def return_book(borrow_id: int, current_user: TokenUser = Depends(verify_access_token),
                       session: Session = Depends(get_session)) -> Borrow:
+    borrow: Optional[Borrow] = await get_borrow(borrow_id, current_user, session)
+    borrow.return_date = datetime.utcnow()
+    session.commit()
+    return borrow
+
+
+@router.get("/{borrow_id}")
+async def return_book(borrow_id: int, current_user: TokenUser = Depends(verify_access_token),
+                      session: Session = Depends(get_session)) -> Borrow:
+    borrow = await get_borrow(borrow_id, current_user, session)
+    return borrow
+
+
+async def get_borrow(borrow_id: int, current_user: TokenUser, session: Session) -> Optional[Borrow]:
     borrow: Optional[Borrow] = session.get(Borrow, borrow_id)
     if not borrow:
         raise HTTPException(status_code=404, detail="Borrowing not found")
-
     if borrow.user_id != current_user.user_id:
         raise HTTPException(status_code=403, detail="You are not the owner of this borrowing")
-
-    borrow.return_date = datetime.utcnow()
-    session.commit()
     return borrow
 
 

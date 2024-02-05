@@ -1,12 +1,13 @@
 import time
+
 import uvicorn
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import SQLModel
 
+from auth.router import router as auth_router
 from author.router import router as author_router
 from books.router import router as books_router
-from auth.router import router as auth_router
 from borrow.router import router as borrow_router
 from db.config import engine
 
@@ -47,6 +48,7 @@ def on_startup():
     #     user = User()
     #     user.username = 'damian'
     #     user.password = pwd_context.hash('test')
+    #     user.role = UserRole.ADMIN
     #     session.add(user)
     #     session.commit()
 

@@ -25,5 +25,5 @@ def verify_access_token(token: str = Depends(oauth2_scheme)) -> TokenUser:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return TokenUser.model_validate(payload)
-    except jwt.JWTError:
+    except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid credentials")

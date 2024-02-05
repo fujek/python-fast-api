@@ -6,8 +6,9 @@ from fastapi.responses import FileResponse
 from sqlmodel import Session, select
 
 from auth.role_service import require_admin_permission
+from auth.schema import TokenUser, UserRole
 from auth.token_service import verify_access_token
-from books.schema import Book, BookInput
+from books.schema import Book, BookInput, BookWithBorrowing
 from db.config import get_session
 
 router = APIRouter(prefix="/api/books")
@@ -43,8 +44,14 @@ def read_books(session: Session = Depends(get_session)) -> Sequence[Book]:
 
 
 @router.get("/{book_id}")
-def read_book(book_id: int, session: Session = Depends(get_session)) -> Book:
-    return get_book(book_id, session)
+def read_book(book_id: int, current_user: TokenUser = Depends(verify_access_token),
+              session: Session = Depends(get_session)) -> Book | BookWithBorrowing:
+    book = get_book(book_id, session)
+    if current_user.role == UserRole.ADMIN:
+        print(book.borrowing)
+        return BookWithBorrowing.model_validate(book)
+    else:
+        return book
 
 
 @router.delete("/{book_id}", status_code=204,
