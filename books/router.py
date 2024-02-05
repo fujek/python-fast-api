@@ -1,5 +1,5 @@
 import os
-from typing import Sequence
+from typing import Sequence, Optional
 
 from fastapi import HTTPException, APIRouter, Depends, UploadFile, File
 from fastapi.responses import FileResponse
@@ -8,6 +8,7 @@ from sqlmodel import Session, select
 from auth.role_service import require_admin_permission
 from auth.schema import TokenUser, UserRole
 from auth.token_service import verify_access_token
+from author.schema import Author
 from books.schema import Book, BookInput, BookWithBorrowing
 from db.config import get_session
 
@@ -38,8 +39,13 @@ def update_book(book_id: int, updated_book: BookInput, session: Session = Depend
 
 
 @router.get("/")
-def read_books(session: Session = Depends(get_session)) -> Sequence[Book]:
-    books = session.exec(select(Book)).all()
+def read_books(name: Optional[str] = None, author: Optional[str] = None, session: Session = Depends(get_session)) -> Sequence[Book]:
+    query = select(Book)
+    if name:
+        query = query.where(Book.name.ilike(f"%{name}%"))
+    if author:
+        query = query.join(Author).where(Author.name.ilike(f"%{author}%"))
+    books = session.exec(query).all()
     return books
 
 
