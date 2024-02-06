@@ -13,10 +13,10 @@ from db.config import engine
 
 app = FastAPI(title="Library")
 
-app.include_router(author_router)
-app.include_router(books_router)
-app.include_router(auth_router)
-app.include_router(borrow_router)
+app.include_router(author_router, tags=['Authors'])
+app.include_router(books_router, tags=['Books'])
+app.include_router(auth_router, tags=['Auth'])
+app.include_router(borrow_router, tags=['Borrowings'])
 
 origins = [
     "http://localhost",
