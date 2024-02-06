@@ -3,9 +3,10 @@ import time
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from sqlmodel import SQLModel
+from sqlmodel import SQLModel, Session
 
-from auth.router import router as auth_router
+from auth.router import router as auth_router, pwd_context
+from auth.schema import User, UserRole
 from author.router import router as author_router
 from books.router import router as books_router
 from borrow.router import router as borrow_router
